@@ -5,6 +5,5 @@ export default class EnvironmentError extends Error {
 	constructor(public message: string) {
 		super(message);
 		this.name = EnvironmentError.name;
-		this.stack = (<any>new Error()).stack;
 	}
 }

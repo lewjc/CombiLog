@@ -1,0 +1,11 @@
+import { Service } from "../../service/types";
+
+export default interface ServiceDataHandler {
+	addNewService(service: Service): Promise<void>;
+
+	getServiceByID(serviceID: string): Promise<Service | null>;
+
+	getServiceBySecret(secret: string): Promise<Service | null>;
+
+	getAllServices(): Promise<Service[] | null>;
+}
