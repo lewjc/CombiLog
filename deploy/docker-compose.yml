@@ -3,7 +3,7 @@ services:
   dashboard:
     image: lewjc/combilog-dashboard:1.0.0
     volumes:
-      - combilog-dashboard:/usr/share/nginx/html
+      - combilog-dashboard:/usr/share/nginx/html/config/
     ports:
       - "9000:80"
     depends_on: [aggregator]
@@ -34,6 +34,6 @@ services:
     command: rethinkdb -d /data --bind all
 
 volumes:
-  combilog-dashboard:
   combilog-db:
+  combilog-dashboard:
   combilog-archive:

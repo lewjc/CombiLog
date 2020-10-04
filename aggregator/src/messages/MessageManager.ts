@@ -13,14 +13,20 @@ export default class MessageManager implements MessageManagement {
 	constructor(@inject(DB_TYPES.MessageBridge) messageBridge: MessageDataHandler) {
 		this.messageBridge = messageBridge;
 	}
+	async deleteMessage(id: string): Promise<boolean> {
+		return this.messageBridge.removeMessage(id);
+	}
 
 	async initialiseConsumerMessageSubscription(
 		consumerConnections: Array<ConsumerSocket>
 	): Promise<void> {
 		return this.messageBridge.subscribeToMessages((message) => {
 			consumerConnections.forEach((consumerSocket) => {
-				console.log(`Sending Messsage to consumer ${consumerSocket.id}`);
-				consumerSocket.socket.send(JSON.stringify(message));
+				console.log("Pushing Message to a consumer");
+				console.log("Message");
+				if (message) {
+					consumerSocket.socket.send(JSON.stringify(message));
+				}
 			});
 		});
 	}

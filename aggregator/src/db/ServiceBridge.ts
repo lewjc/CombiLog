@@ -101,4 +101,28 @@ export default class ServiceBridge implements ServiceDataHandler {
 				});
 		});
 	}
+
+	async setServiceOnlineStatus(id: string, status: boolean): Promise<boolean> {
+		return this.db.connect(this.db.info.name).then((connection: Connection) => {
+			return r
+				.table(this.db.info.tableNames.service)
+				.get(id)
+				.update({ online: status })
+				.run(connection)
+				.then((x) => {
+					if (x.changes && x.changes.length > 0) {
+						return true;
+					} else {
+						return false;
+					}
+				})
+				.catch((err) => {
+					console.error(err);
+					return false;
+				})
+				.finally(() => {
+					connection.close();
+				});
+		});
+	}
 }

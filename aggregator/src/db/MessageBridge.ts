@@ -30,7 +30,10 @@ export default class MessageBridge implements MessageDataHandler {
 						console.error(error);
 						return;
 					}
-					onMessage(row["new_val"] as SocketMessage);
+					const newValue = row["new_val"];
+					if (newValue) {
+						onMessage(newValue as SocketMessage);
+					}
 				});
 			})
 			.catch((x) => {});
@@ -51,6 +54,24 @@ export default class MessageBridge implements MessageDataHandler {
 				})
 				.catch((error) => {
 					console.error("An error occured whilst adding a message to the database." + error);
+				})
+				.finally(() => {
+					this.db.close(connection);
+				});
+		});
+	}
+
+	async removeMessage(id: string): Promise<boolean> {
+		return this.db.connect(this.db.info.name).then((connection) => {
+			return r
+				.table(this.db.info.tableNames.message)
+				.get(id)
+				.delete()
+				.run(connection)
+				.then((result) => result.deleted === 1)
+				.catch((err) => {
+					console.error(err);
+					return false;
 				})
 				.finally(() => {
 					this.db.close(connection);

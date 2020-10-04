@@ -7,21 +7,28 @@ import ServiceManagement from "../../service/interfaces/ServiceManagement";
 const router: Router = express.Router();
 // POST /service/add
 router.post("/add", async (req: Request, res: Response) => {
-	if (req.body["friendlyName"]) {
-		const register: ServiceManagement = Resolver.get<ServiceManagement>(
-			SERVICE_TYPES.ServiceManager
-		);
-		const service = await register.registerService(req.body.friendlyName);
+	const friendlyName = req.body["friendlyName"];
+	if (friendlyName) {
+		if (RegExp(/^[0-9A-Za-z\s\-]+$/).test(friendlyName)) {
+			const register: ServiceManagement = Resolver.get<ServiceManagement>(
+				SERVICE_TYPES.ServiceManager
+			);
+			const service = await register.registerService(req.body.friendlyName);
 
-		if (service) {
-			res.status(201).json({
-				message: "Registered service sucessfully.",
-				service: service,
-			});
+			if (service) {
+				res.status(201).json({
+					message: "Registered service sucessfully.",
+					service: service,
+				});
+			} else {
+				res.status(500).json({
+					message: "An error occured, please check the aggregator logs.",
+					service: service,
+				});
+			}
 		} else {
-			res.status(500).json({
-				message: "An error occured, please check the aggregator logs.",
-				service: service,
+			res.status(400).json({
+				message: "Friendly name must be only letters, numbers and dashes (-)",
 			});
 		}
 	} else {

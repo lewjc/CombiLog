@@ -4,4 +4,5 @@ export type Service = {
 	secret: string;
 	dateAdded: string;
 	eventCount: number;
+	online?: boolean;
 };

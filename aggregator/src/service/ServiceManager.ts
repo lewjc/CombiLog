@@ -54,4 +54,8 @@ export default class ServiceManager implements ServiceManagement {
 	async getAllServices(): Promise<Service[] | null> {
 		return this._serviceBridge.getAllServices();
 	}
+
+	async setServiceStatus(id: string, status: boolean): Promise<boolean> {
+		return this._serviceBridge.setServiceOnlineStatus(id, status);
+	}
 }

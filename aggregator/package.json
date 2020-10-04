@@ -5,13 +5,15 @@
 	"main": "server.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"tsc": "tsc && cp ./.env ./dist"
+		"tsc": "tsc && cp ./.env ./dist",
+		"build": "tsc -p ."
 	},
 	"author": "Lewis Cummins",
 	"license": "ISC",
 	"dependencies": {
 		"@types/body-parser": "^1.19.0",
 		"@types/cors": "^2.8.7",
+		"@types/crypto-random-string": "^2.0.0",
 		"@types/express": "^4.17.7",
 		"@types/reflect-metadata": "^0.1.0",
 		"@types/rethinkdb": "^2.3.16",
@@ -19,6 +21,7 @@
 		"@types/ws": "^7.2.6",
 		"body-parser": "^1.19.0",
 		"cors": "^2.8.5",
+		"crypto-random-string": "^3.3.0",
 		"dotenv": "^8.2.0",
 		"express": "^4.17.1",
 		"inversify": "^5.0.1",

@@ -16,6 +16,7 @@ import { SERVICE_TYPES } from "../service/inversify.types";
 import { MESSAGE_TYPES } from "../messages/inversify.types";
 import ServiceManagement from "../service/interfaces/ServiceManagement";
 import MessageManagement from "../messages/interfaces/MessageManagement";
+import { Service } from "../service/types";
 
 @injectable()
 class SocketManager implements SocketHub {
@@ -103,8 +104,9 @@ class SocketManager implements SocketHub {
 				console.log(`Accepted connection for service ${service.friendlyName}`);
 				serviceSocket.socket.send("OK");
 				this.serviceConnections.push(serviceSocket);
+				this.serviceManager.setServiceStatus(service.id, true);
 				serviceSocket.socket.on("message", async (data: Data) => {
-					await this.serviceSocketOnMessage(socket, data);
+					await this.serviceSocketOnMessage(socket, data, service);
 				});
 
 				serviceSocket.socket.on("close", async (code, reason) => {
@@ -114,6 +116,7 @@ class SocketManager implements SocketHub {
 						})
 						.indexOf(secret);
 					this.serviceConnections.splice(index, 1);
+					await this.serviceManager.setServiceStatus(service.id, false);
 				});
 			} else {
 				console.error(`No service found for secret: ${secret}`);
@@ -140,11 +143,15 @@ class SocketManager implements SocketHub {
 		this.consumerConnections.push(consumerSocket);
 	}
 
-	private async serviceSocketOnMessage(socket: WebSocket, data: Data) {
+	private async serviceSocketOnMessage(socket: WebSocket, data: Data, service: Service) {
 		// Now we have recieved a message from one of our services, we need to see if there are any consumer connections and broadcast to all of them.
 		// Following that, we need to push messages to the archiving queue which then stores these in a designated data area. (redis for storing archived logs)
 		try {
 			const message: SocketMessage = JSON.parse(data.toString()) as SocketMessage;
+			message.service = { ...service };
+			// Blank out the secret
+			message.service.secret = "******";
+			message.service.id = "******";
 			if (message != null) {
 				switch (message.type) {
 					case MessageType.LOG: {
