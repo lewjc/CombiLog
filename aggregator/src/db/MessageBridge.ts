@@ -21,8 +21,15 @@ export default class MessageBridge implements MessageDataHandler {
 				return r
 					.db(this.db.info.name)
 					.table(this.db.info.tableNames.message)
-					.changes()
-					.run(connection);
+					.wait()
+					.run(connection)
+					.then(() => {
+						return r
+							.db(this.db.info.name)
+							.table(this.db.info.tableNames.message)
+							.changes()
+							.run(connection);
+					});
 			})
 			.then((cursor) => {
 				cursor.each((error, row) => {
@@ -36,7 +43,9 @@ export default class MessageBridge implements MessageDataHandler {
 					}
 				});
 			})
-			.catch((x) => {});
+			.catch((x) => {
+				console.error("Error occured when listening to changes: " + x);
+			});
 	}
 
 	async pushMessageToQueue(message: SocketMessage) {

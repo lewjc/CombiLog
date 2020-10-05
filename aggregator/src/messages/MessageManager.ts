@@ -22,8 +22,6 @@ export default class MessageManager implements MessageManagement {
 	): Promise<void> {
 		return this.messageBridge.subscribeToMessages((message) => {
 			consumerConnections.forEach((consumerSocket) => {
-				console.log("Pushing Message to a consumer");
-				console.log("Message");
 				if (message) {
 					consumerSocket.socket.send(JSON.stringify(message));
 				}
