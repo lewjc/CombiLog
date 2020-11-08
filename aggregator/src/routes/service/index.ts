@@ -42,7 +42,7 @@ router.post("/add", async (req: Request, res: Response) => {
 router.post("/bulk-add", async (req: Request, res: Response) => {
 	try {
 		const createdServices: Array<Service | null> = [];
-		const services: Service[] = JSON.parse(req.body["services"]);
+		const services: Service[] = req.body["services"];
 		const errors: string[] = [];
 		let isInternalServerError = false;
 
