@@ -8,12 +8,13 @@ const router: Router = express.Router();
 // POST /service/add
 router.post("/add", async (req: Request, res: Response) => {
 	const friendlyName = req.body["friendlyName"];
+	const secret = req.body["secret"];
 	if (friendlyName) {
 		if (RegExp(/^[0-9A-Za-z\s\-]+$/).test(friendlyName)) {
 			const register: ServiceManagement = Resolver.get<ServiceManagement>(
 				SERVICE_TYPES.ServiceManager
 			);
-			const service = await register.registerService(req.body.friendlyName);
+			const service = await register.registerService(req.body.friendlyName, secret);
 
 			if (service) {
 				res.status(201).json({
@@ -38,6 +39,51 @@ router.post("/add", async (req: Request, res: Response) => {
 	}
 });
 
+router.post("/bulk-add", async (req: Request, res: Response) => {
+	const services: Service[] = JSON.parse(req.body);
+	const createdServices: Array<Service | null> = [];
+	const errors: string[] = [];
+	let isInternalServerError = false;
+
+	for (const service of services) {
+		if (RegExp(/^[0-9A-Za-z\s\-]+$/).test(service.friendlyName)) {
+			const register: ServiceManagement = Resolver.get<ServiceManagement>(
+				SERVICE_TYPES.ServiceManager
+			);
+			const createdService = await register.registerService(service.friendlyName, service.secret);
+			if (createdService) {
+				createdServices.push(createdService);
+			} else {
+				errors.push("An error occured, please check the aggregator logs.");
+				isInternalServerError = true;
+			}
+		} else {
+			errors.push(
+				`Friendly name ${service.friendlyName} invalid. name must be only letters, numbers and dashes (-) `
+			);
+		}
+	}
+
+	if (errors.length > 0) {
+		if (isInternalServerError) {
+			res.status(500).json({
+				message: "One or more services failed registration.",
+				errors,
+			});
+		} else {
+			res.status(400).json({
+				message: "One or more services failed registration.",
+				errors,
+			});
+		}
+	} else {
+		res.status(201).json({
+			message: "All services registered successfully.",
+			services: services,
+		});
+	}
+});
+
 router.get("/all", async (req: Request, res: Response) => {
 	const manager: ServiceManagement = Resolver.get<ServiceManagement>(SERVICE_TYPES.ServiceManager);
 	const allServices = await manager.getAllServices();
@@ -53,13 +99,13 @@ router.get("/all", async (req: Request, res: Response) => {
 	}
 });
 
+router.get("/heartbeat", async (req: Request, res: Response) => {
+	res.send("beep");
+});
+
 function isService(body: any): body is Service {
 	const potentialType = body as Service;
 	return potentialType.friendlyName !== undefined && potentialType.secret !== undefined;
 }
-
-router.get("/heartbeat", async (req: Request, res: Response) => {
-	res.send("beep");
-});
 
 export default router;

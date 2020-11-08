@@ -57,8 +57,6 @@ export default class MessageBridge implements MessageDataHandler {
 				.then((result) => {
 					if (result.inserted === 0) {
 						console.error("Failed to insert message into the databasse.");
-					} else {
-						console.info("Pushed Message to queue.");
 					}
 				})
 				.catch((error) => {

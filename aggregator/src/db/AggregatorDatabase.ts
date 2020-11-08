@@ -7,9 +7,6 @@ import { injectable } from "inversify";
 
 @injectable()
 export default class AggregatorDatabase implements DatabaseContext {
-	static readonly SERVICE_DATABASE_NAME: string = "COMBILOG_SERVICES";
-	static readonly MESSAGE_DATABASE_NAME: string = "COMBILOG_MESSAGES";
-
 	readonly info: DatabaseInfo;
 	readonly tableKeys: object = {};
 
@@ -43,10 +40,11 @@ export default class AggregatorDatabase implements DatabaseContext {
 		}
 
 		this.info = {
-			name: "COMBILOG_SERVICES",
+			name: "COMBILOG",
 			tableNames: {
 				message: "MESSAGE",
 				service: "SERVICE",
+				statistics: "STATISTICS",
 			},
 		};
 	}

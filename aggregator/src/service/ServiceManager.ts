@@ -20,18 +20,24 @@ export default class ServiceManager implements ServiceManagement {
 	 * @param url The url of the service.
 	 * @returns The id of the service socket
 	 */
-	async registerService(friendlyName: string): Promise<Service | null> {
+
+	async registerService(friendlyName: string, secret?: string): Promise<Service | null> {
+		let mySecret: string;
+		if (secret) {
+			mySecret = secret;
+		} else {
+			mySecret = cryptoRandomString({
+				length: 16,
+				type: "url-safe",
+			});
+		}
 		const id: string = uuid();
-		const secret: string = cryptoRandomString({
-			length: 16,
-			type: "url-safe",
-		});
 
 		try {
 			const service: Service = {
 				id: id,
 				friendlyName: friendlyName,
-				secret: secret,
+				secret: mySecret,
 				dateAdded: new Date().toISOString(),
 				eventCount: 0,
 			};
