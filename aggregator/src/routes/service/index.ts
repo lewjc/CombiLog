@@ -40,46 +40,53 @@ router.post("/add", async (req: Request, res: Response) => {
 });
 
 router.post("/bulk-add", async (req: Request, res: Response) => {
-	const services: Service[] = JSON.parse(req.body);
-	const createdServices: Array<Service | null> = [];
-	const errors: string[] = [];
-	let isInternalServerError = false;
+	try {
+		const createdServices: Array<Service | null> = [];
+		const services: Service[] = JSON.parse(req.body["services"]);
+		const errors: string[] = [];
+		let isInternalServerError = false;
 
-	for (const service of services) {
-		if (RegExp(/^[0-9A-Za-z\s\-]+$/).test(service.friendlyName)) {
-			const register: ServiceManagement = Resolver.get<ServiceManagement>(
-				SERVICE_TYPES.ServiceManager
-			);
-			const createdService = await register.registerService(service.friendlyName, service.secret);
-			if (createdService) {
-				createdServices.push(createdService);
+		for (const service of services) {
+			if (RegExp(/^[0-9A-Za-z\s\-]+$/).test(service.friendlyName)) {
+				const register: ServiceManagement = Resolver.get<ServiceManagement>(
+					SERVICE_TYPES.ServiceManager
+				);
+				const createdService = await register.registerService(service.friendlyName, service.secret);
+				if (createdService) {
+					createdServices.push(createdService);
+				} else {
+					errors.push("An error occured, please check the aggregator logs.");
+					isInternalServerError = true;
+				}
 			} else {
-				errors.push("An error occured, please check the aggregator logs.");
-				isInternalServerError = true;
+				errors.push(
+					`Friendly name ${service.friendlyName} invalid. name must be only letters, numbers and dashes (-) `
+				);
+			}
+		}
+
+		if (errors.length > 0) {
+			if (isInternalServerError) {
+				res.status(500).json({
+					message: "One or more services failed registration.",
+					errors,
+				});
+			} else {
+				res.status(400).json({
+					message: "One or more services failed registration.",
+					errors,
+				});
 			}
 		} else {
-			errors.push(
-				`Friendly name ${service.friendlyName} invalid. name must be only letters, numbers and dashes (-) `
-			);
-		}
-	}
-
-	if (errors.length > 0) {
-		if (isInternalServerError) {
-			res.status(500).json({
-				message: "One or more services failed registration.",
-				errors,
-			});
-		} else {
-			res.status(400).json({
-				message: "One or more services failed registration.",
-				errors,
+			res.status(201).json({
+				message: "All services registered successfully.",
+				services: services,
 			});
 		}
-	} else {
-		res.status(201).json({
-			message: "All services registered successfully.",
-			services: services,
+	} catch (e) {
+		console.error(e);
+		res.status(500).json({
+			errors: ["An internal server error occured. Please check the logs."],
 		});
 	}
 });
