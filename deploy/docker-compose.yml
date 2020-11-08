@@ -1,0 +1,39 @@
+version: "2.0"
+services:
+  dashboard:
+    image: lewjc/combilog-dashboard:1.0.0
+    volumes:
+      - combilog-dashboard:/usr/share/nginx/html/config/
+    ports:
+      - "9000:80"
+    depends_on: [aggregator]
+  archiver:
+    image: lewjc/combilog-archiver:1.0.0
+    volumes:
+      - combilog-archive:/usr/src/app/data
+    ports:
+      - "13338:13338"
+    env_file:
+      - archive.env
+    depends_on: [aggregator]
+  aggregator:
+    image: lewjc/combilog-aggregator:1.0.0
+    ports:
+      - "13337:13337"
+      - "3000:3000"
+    depends_on: [rethinkdb]
+    env_file:
+      - aggregator.env
+  rethinkdb:
+    image: rethinkdb:latest
+    volumes:
+      - combilog-db:/data
+    ports:
+      - "8080:8080"
+      - "28015:28015"
+    command: rethinkdb -d /data --bind all
+
+volumes:
+  combilog-db:
+  combilog-dashboard:
+  combilog-archive:

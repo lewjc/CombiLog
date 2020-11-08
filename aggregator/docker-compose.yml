@@ -1,0 +1,16 @@
+version: "2.0"
+services:
+  aggregator:
+    image: combilog-aggregator:1.2.0
+    ports:
+      - "13337:13337"
+      - "3000:3000"
+    depends_on: [rethinkdb]
+    env_file:
+      - .env
+  rethinkdb:
+    image: rethinkdb:latest
+    ports:
+      - "8080:8080"
+      - "28015:28015"
+    command: rethinkdb --bind all
