@@ -1,7 +1,7 @@
 version: "2.0"
 services:
   aggregator:
-    image: combilog-aggregator:1.0.0
+    image: combilog-aggregator:1.2.0
     ports:
       - "13337:13337"
       - "3000:3000"
