@@ -17,7 +17,7 @@ jobs:
           version: 19.03.13
       - run:
           name: Set Tag
-          command: if [ "$CIRCLE_BRANCH" == "master" ]; then echo 'export TAG=$MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION' >> $BASH_ENV ; else echo 'export TAG=latest-$CIRCLE_BRANCH' >> $BASH_ENV; fi
+          command: if [ "$CIRCLE_BRANCH" == "master" ]; then echo 'export TAG=$MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION' >> $BASH_ENV ; else echo 'export TAG=latest-${CIRCLE_BRANCH////-}' >> $BASH_ENV; fi
       - run:
           name: Build Docker image
           command: cd aggregator && docker build -t $IMAGE_NAME:$TAG .
