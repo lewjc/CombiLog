@@ -27,6 +27,7 @@ class SocketManager implements SocketHub {
 	private readonly port: number;
 	private readonly serviceConnections: Array<ServiceSocket> = [];
 	private readonly consumerConnections: Array<ConsumerSocket> = [];
+	private readonly servicesConnecting: Array<String> = [];
 
 	constructor(
 		@inject(SERVICE_TYPES.ServiceManager) serviceManager: ServiceManagement,
@@ -61,7 +62,6 @@ class SocketManager implements SocketHub {
 				let incomingUrl = url.parse(builtUrl, true);
 				const connectionType: string | Array<string> | undefined =
 					incomingUrl.query["connectionType"];
-
 				if (!connectionType || connectionType instanceof Array) {
 					console.error(`Invalid connection type query parameter passed ${connectionType}`);
 					socket.close(ClosureCodes.INVALID_CONNECTION_QUERY_PARAM);
@@ -72,13 +72,17 @@ class SocketManager implements SocketHub {
 						console.error(`Invalid secret header provided for service connection.`);
 						socket.close(ClosureCodes.INVALID_SECRET);
 					} else if (
-						this.serviceConnections.filter((x) => x.service.secret === secret).length > 0
+						this.serviceConnections.filter((x) => x.service.secret === secret).length > 0 ||
+						this.servicesConnecting.includes(secret)
 					) {
 						console.error(`Secret already in use.`);
 						socket.close(ClosureCodes.SECRET_IN_USE);
 						socket.terminate();
 					} else {
-						this.handleServiceConnection(socket, secret);
+						if (!this.servicesConnecting.includes(secret)) {
+							this.servicesConnecting.push(secret);
+							this.handleServiceConnection(socket, secret);
+						}
 					}
 				} else if (connectionType === "consumer") {
 					this.handleConsumerConnection(socket);
@@ -101,21 +105,35 @@ class SocketManager implements SocketHub {
 					socket: socket,
 				};
 
-				console.log(`Accepted connection for service ${service.friendlyName}`);
 				serviceSocket.socket.send("OK");
 				this.serviceConnections.push(serviceSocket);
 				this.serviceManager.setServiceStatus(service.id, true);
+				this.serviceConnections.splice(this.servicesConnecting.indexOf(secret), 1);
+				console.log(`Accepted connection for service ${service.friendlyName}`);
 				serviceSocket.socket.on("message", async (data: Data) => {
 					await this.serviceSocketOnMessage(socket, data, service);
 				});
 
-				serviceSocket.socket.on("close", async (code, reason) => {
+				const closeConnection = () => {
 					const index = this.serviceConnections
 						.map(function (e) {
 							return e.service.secret;
 						})
 						.indexOf(secret);
 					this.serviceConnections.splice(index, 1);
+				};
+
+				serviceSocket.socket.on("error", async (err) => {
+					closeConnection();
+					console.error(`Closing connection for ${service.friendlyName}. Error: ${err}`);
+					await this.serviceManager.setServiceStatus(service.id, false);
+				});
+
+				serviceSocket.socket.on("close", async (code, reason) => {
+					closeConnection();
+					console.info(
+						`Closing connection for ${service.friendlyName}. Code: ${code} - Reason: ${reason}`
+					);
 					await this.serviceManager.setServiceStatus(service.id, false);
 				});
 			} else {
@@ -132,14 +150,25 @@ class SocketManager implements SocketHub {
 			socket: socket,
 		};
 		console.log("Registered Consumer");
-		socket.on("close", async () => {
+
+		const closeConnection = () => {
 			const index = this.consumerConnections
 				.map(function (e) {
 					return e.id;
 				})
 				.indexOf(sessionID);
 			this.serviceConnections.splice(index, 1);
+		};
+
+		socket.on("error", async (err) => {
+			closeConnection();
+			console.log(`Error with consumer connection: ${err}`);
 		});
+
+		socket.on("close", async (code, reason) => {
+			console.info(`Closing connection for Consumer. Code: ${code} - Reason: ${reason}`);
+		});
+
 		this.consumerConnections.push(consumerSocket);
 	}
 
