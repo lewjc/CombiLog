@@ -108,7 +108,7 @@ class SocketManager implements SocketHub {
 				serviceSocket.socket.send("OK");
 				this.serviceConnections.push(serviceSocket);
 				this.serviceManager.setServiceStatus(service.id, true);
-				this.serviceConnections.splice(this.servicesConnecting.indexOf(secret), 1);
+				this.servicesConnecting.splice(this.servicesConnecting.indexOf(secret), 1);
 				console.log(`Accepted connection for service ${service.friendlyName}`);
 				serviceSocket.socket.on("message", async (data: Data) => {
 					await this.serviceSocketOnMessage(socket, data, service);
