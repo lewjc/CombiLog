@@ -102,13 +102,13 @@ class SocketManager implements SocketHub {
 
 		setInterval(() => {
 			this.consumerConnections.forEach((connection) => {
-				connection.socket.send(JSON.stringify(ping));
+				connection.socket.ping(JSON.stringify(ping));
 			});
 
 			this.serviceConnections.forEach((connection) => {
-				connection.socket.send(JSON.stringify(ping));
+				connection.socket.ping(JSON.stringify(ping));
 			});
-		}, 120000);
+		}, 55000);
 	}
 
 	private handleServiceConnection(socket: WebSocket, secret: string): void {
