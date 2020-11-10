@@ -3,13 +3,13 @@ import { ErrorMessageCode } from "./enums/ErrorMessageCodes";
 import { Service } from "../service/types";
 
 export type SocketMessage = {
-	id?: string;
-	type: MessageType;
-	content: string;
-	service?: Service;
+  id?: string;
+  type: MessageType;
+  content: string;
+  service?: Service;
 };
 
 export interface ErrorMessage {
-	message: string;
-	errorCode: ErrorMessageCode;
+  message: string;
+  errorCode: ErrorMessageCode;
 }

@@ -9,59 +9,65 @@ import ServiceDataHandler from "../db/interfaces/ServiceDataHandler";
 
 @injectable()
 export default class ServiceManager implements ServiceManagement {
-	private _serviceBridge: ServiceDataHandler;
+  private _serviceBridge: ServiceDataHandler;
 
-	constructor(@inject(DB_TYPES.ServiceBridge) serviceBridge: ServiceDataHandler) {
-		this._serviceBridge = serviceBridge;
-	}
+  constructor(
+    @inject(DB_TYPES.ServiceBridge) serviceBridge: ServiceDataHandler
+  ) {
+    this._serviceBridge = serviceBridge;
+  }
 
-	/**
-	 * Registers a service in the aggregator
-	 * @param url The url of the service.
-	 * @returns The id of the service socket
-	 */
+  /**
+   * Registers a service in the aggregator
+   * @param url The url of the service.
+   * @returns The id of the service socket
+   */
 
-	async registerService(friendlyName: string, secret?: string): Promise<Service | null> {
-		let mySecret: string;
-		if (secret) {
-			mySecret = secret;
-		} else {
-			mySecret = cryptoRandomString({
-				length: 16,
-				type: "url-safe",
-			});
-		}
-		const id: string = uuid();
+  async registerService(
+    friendlyName: string,
+    secret?: string
+  ): Promise<Service | null> {
+    let mySecret: string;
+    if (secret) {
+      mySecret = secret;
+    } else {
+      mySecret = cryptoRandomString({
+        length: 16,
+        type: "url-safe",
+      });
+    }
+    const id: string = uuid();
 
-		try {
-			const service: Service = {
-				id: id,
-				friendlyName: friendlyName,
-				secret: mySecret,
-				dateAdded: new Date().toISOString(),
-				eventCount: 0,
-			};
-			await this._serviceBridge.addNewService(service);
-			console.log(`Created new service: ${service}`);
-			return service;
-		} catch (e) {
-			console.error(
-				"An error occured. It may be to do with adding a service to the service database: " + e
-			);
-		}
+    try {
+      const service: Service = {
+        id: id,
+        friendlyName: friendlyName,
+        secret: mySecret,
+        dateAdded: new Date().toISOString(),
+        eventCount: 0,
+      };
+      await this._serviceBridge.addNewService(service);
+      console.log(`Created new service: ${service}`);
+      return service;
+    } catch (e) {
+      console.error(
+        "An error occured. It may be to do with adding a service to the service database: " +
+          e
+      );
+    }
 
-		return null;
-	}
+    return null;
+  }
 
-	async findServiceBySecret(secret: string): Promise<Service | null> {
-		return this._serviceBridge.getServiceBySecret(secret);
-	}
+  async findServiceBySecret(secret: string): Promise<Service | null> {
+    return this._serviceBridge.getServiceBySecret(secret);
+  }
 
-	async getAllServices(): Promise<Service[] | null> {
-		return this._serviceBridge.getAllServices();
-	}
+  async getAllServices(): Promise<Service[] | null> {
+    return this._serviceBridge.getAllServices();
+  }
 
-	async setServiceStatus(id: string, status: boolean): Promise<boolean> {
-		return this._serviceBridge.setServiceOnlineStatus(id, status);
-	}
+  async setServiceStatus(id: string, status: boolean): Promise<boolean> {
+    return this._serviceBridge.setServiceOnlineStatus(id, status);
+  }
 }
