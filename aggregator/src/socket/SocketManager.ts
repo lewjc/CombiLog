@@ -179,7 +179,7 @@ class SocketManager implements SocketHub {
 					return e.id;
 				})
 				.indexOf(sessionID);
-			this.serviceConnections.splice(index, 1);
+			this.consumerConnections.splice(index, 1);
 		};
 
 		socket.on("error", async (err) => {
@@ -188,6 +188,7 @@ class SocketManager implements SocketHub {
 		});
 
 		socket.on("close", async (code, reason) => {
+			closeConnection();
 			console.info(`Closing connection for Consumer. Code: ${code} - Reason: ${reason}`);
 		});
 
