@@ -21,9 +21,9 @@ dotenv.config();
 app.use(bodyParser.json());
 app.use(cors());
 app.use(
-	bodyParser.urlencoded({
-		extended: true,
-	})
+  bodyParser.urlencoded({
+    extended: true,
+  })
 );
 
 const port: number = parseInt(process.env.COMBILOG_PORT ?? "8090");
@@ -32,18 +32,20 @@ const port: number = parseInt(process.env.COMBILOG_PORT ?? "8090");
 app.use("/api", router);
 
 async function main() {
-	const socketRegister = await setupSockerRegister();
-	app.listen(port, () => {
-		console.log(`Listening on port ${port}`);
-	});
+  const socketRegister = await setupSockerRegister();
+  app.listen(port, () => {
+    console.log(`Listening on port ${port}`);
+  });
 }
 
 async function setupSockerRegister(): Promise<SocketHub> {
-	const db: AggregatorDatabase = Resolver.get<DatabaseContext>(DB_TYPES.AggreagtorDatabase);
+  const db: AggregatorDatabase = Resolver.get<DatabaseContext>(
+    DB_TYPES.AggreagtorDatabase
+  );
 
-	return db.initialiseDatabase().then(() => {
-		return Resolver.get<SocketHub>(SOCKET_TYPES.SocketManager);
-	});
+  return db.initialiseDatabase().then(() => {
+    return Resolver.get<SocketHub>(SOCKET_TYPES.SocketManager);
+  });
 }
 
 main();

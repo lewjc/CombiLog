@@ -7,8 +7,8 @@ import WebSocket from "ws";
  * @property url: The url of the Service
  */
 export type ConsumerSocket = {
-	id: string;
-	socket: WebSocket;
+  id: string;
+  socket: WebSocket;
 };
 
 /*
@@ -17,7 +17,7 @@ export type ConsumerSocket = {
  * @property url: The url of the Service
  */
 export type ServiceSocket = {
-	id: string;
-	service: Service;
-	socket: WebSocket;
+  id: string;
+  service: Service;
+  socket: WebSocket;
 };

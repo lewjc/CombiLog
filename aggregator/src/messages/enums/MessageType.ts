@@ -1,4 +1,5 @@
 export const enum MessageType {
-	LOG,
-	EVENT,
+  LOG,
+  EVENT,
+  KEEPALIVE,
 }

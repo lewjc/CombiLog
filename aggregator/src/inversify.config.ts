@@ -20,12 +20,20 @@ import ServiceManager from "./service/ServiceManager";
 
 const Resolver = new Container();
 
-Resolver.bind<ServiceManagement>(SERVICE_TYPES.ServiceManager).to(ServiceManager);
-Resolver.bind<MessageManagement>(MESSAGE_TYPES.MessageManager).to(MessageManager);
+Resolver.bind<ServiceManagement>(SERVICE_TYPES.ServiceManager).to(
+  ServiceManager
+);
+Resolver.bind<MessageManagement>(MESSAGE_TYPES.MessageManager).to(
+  MessageManager
+);
 Resolver.bind<MessageDataHandler>(DB_TYPES.MessageBridge).to(MessageBridge);
 Resolver.bind<ServiceDataHandler>(DB_TYPES.ServiceBridge).to(ServiceBridge);
-Resolver.bind<DatabaseContext>(DB_TYPES.AggreagtorDatabase).to(AggregatorDatabase);
+Resolver.bind<DatabaseContext>(DB_TYPES.AggreagtorDatabase).to(
+  AggregatorDatabase
+);
 
-Resolver.bind<SocketHub>(SOCKET_TYPES.SocketManager).to(SocketManager).inSingletonScope();
+Resolver.bind<SocketHub>(SOCKET_TYPES.SocketManager)
+  .to(SocketManager)
+  .inSingletonScope();
 
 export { Resolver };

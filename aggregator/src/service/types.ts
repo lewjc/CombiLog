@@ -1,8 +1,8 @@
 export type Service = {
-	friendlyName: string;
-	id: string;
-	secret: string;
-	dateAdded: string;
-	eventCount: number;
-	online?: boolean;
+  friendlyName: string;
+  id: string;
+  secret: string;
+  dateAdded: string;
+  eventCount: number;
+  online?: boolean;
 };

@@ -1,6 +1,6 @@
 import { ErrorMessageCode } from "./enums/ErrorMessageCodes";
 
 export interface ErrorMessage {
-	message: string;
-	errorCode: ErrorMessageCode;
+  message: string;
+  errorCode: ErrorMessageCode;
 }

@@ -1,3 +1,3 @@
 export enum ErrorMessageCode {
-	INVALID_MESSAGE_TYPE = 1,
+  INVALID_MESSAGE_TYPE = 1,
 }
