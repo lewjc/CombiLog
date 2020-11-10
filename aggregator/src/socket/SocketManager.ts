@@ -47,6 +47,7 @@ class SocketManager implements SocketHub {
 		console.info(`Socket Manager Listening on Port: ${this.port}`);
 
 		this.initialiseAggregatorServerEvents();
+		this.initialisePing();
 		this.messageManager.initialiseConsumerMessageSubscription(this.consumerConnections);
 		console.info("Socket Register Status: Ready!");
 	}
@@ -99,15 +100,20 @@ class SocketManager implements SocketHub {
 		const ping = {
 			ping: "pong",
 		};
-
+		
 		setInterval(() => {
 			this.consumerConnections.forEach((connection) => {
 				connection.socket.ping(JSON.stringify(ping));
 			});
 
+			console.log(`Pingged ${this.consumerConnections.length} Consumers`);
+
 			this.serviceConnections.forEach((connection) => {
 				connection.socket.ping(JSON.stringify(ping));
 			});
+
+			console.log(`Pingged ${this.serviceConnections.length} Services`);
+
 		}, 55000);
 	}
 
