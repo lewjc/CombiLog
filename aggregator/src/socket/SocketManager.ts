@@ -95,6 +95,22 @@ class SocketManager implements SocketHub {
 		});
 	}
 
+	private initialisePing() {
+		const ping = {
+			ping: "pong",
+		};
+
+		setInterval(() => {
+			this.consumerConnections.forEach((connection) => {
+				connection.socket.ping(JSON.stringify(ping));
+			});
+
+			this.serviceConnections.forEach((connection) => {
+				connection.socket.ping(JSON.stringify(ping));
+			});
+		}, 55000);
+	}
+
 	private handleServiceConnection(socket: WebSocket, secret: string): void {
 		this.serviceManager.findServiceBySecret(secret).then((service) => {
 			if (service) {
