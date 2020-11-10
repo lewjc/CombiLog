@@ -17,29 +17,29 @@ export default class MessageBridge implements MessageDataHandler {
 	public async subscribeToMessages(onMessage: (message: SocketMessage) => void): Promise<void> {
 		return this.db
 			.connect(this.db.info.name)
-			.then((connection) => {
-				return r
+			.then(async (connection) => {
+				await r
 					.db(this.db.info.name)
 					.table(this.db.info.tableNames.message)
 					.wait()
-					.run(connection)
-					.then(() => {
-						return r
-							.db(this.db.info.name)
-							.table(this.db.info.tableNames.message)
-							.changes()
-							.run(connection);
-					});
+					.run(connection);
+				return r
+					.db(this.db.info.name)
+					.table(this.db.info.tableNames.message)
+					.changes()
+					.run(connection);
 			})
 			.then((cursor) => {
 				cursor.each((error, row) => {
 					if (error) {
 						console.error(error);
 						return;
-					}
+					}					
 					const newValue = row["new_val"];
-					if (newValue) {
-						onMessage(newValue as SocketMessage);
+					if (newValue) {						
+						const socketMessage = newValue as SocketMessage;
+						console.log(`Recieved message from ${socketMessage.service?.friendlyName} @ ${Date.now().toString()}`);
+						onMessage(socketMessage);
 					}
 				});
 			})
@@ -56,8 +56,8 @@ export default class MessageBridge implements MessageDataHandler {
 				.run(connection)
 				.then((result) => {
 					if (result.inserted === 0) {
-						console.error("Failed to insert message into the databasse.");
-					}
+						console.error("Failed to insert message into the database.")
+					} 
 				})
 				.catch((error) => {
 					console.error("An error occured whilst adding a message to the database." + error);
