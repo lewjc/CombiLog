@@ -97,3 +97,5 @@ const combilogMessage = {
 }
 
 ```
+
+7. View your messages in the Realtime Log Viewer.
