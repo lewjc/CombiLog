@@ -44,7 +44,7 @@ RETHINK_USER=admin
 // Password for rethinkdb
 RETHINK_PASSWORD=
 
-// Communication port for rethindb (default 28015)
+// Communication port for rethinkdb (default 28015)
 RETHINK_PORT=28015
 
 // The port that the combilog express server will listen on.
@@ -55,7 +55,7 @@ COMBILOG_PORT=3000
 
 Handlers are packages you can install that make integrating with CombiLog easier for you. The current list of handlers available are listed below.
 
-- [Python handler](https://github.com/lewjc/CombiLog-PythonHandler)
+- [Python Handler](https://github.com/lewjc/CombiLog-PythonHandler)
 
 ## For Development
 
