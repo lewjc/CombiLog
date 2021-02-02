@@ -83,6 +83,11 @@ const query = '?connectionType=service'
 
 // Use this url to connect to the websocket server in your chosen language.
 const fullURL = $`{url}{query}`
+
+// Add a header to the socket open request with the following contents
+
+const headers = { "combilog-service-secret": "MY-SUPER-SECRET"}
+
 ```
 
 6. To send a Log Message to the aggregator, use your connection to the websocket server to send a message, using the following JSON payload
