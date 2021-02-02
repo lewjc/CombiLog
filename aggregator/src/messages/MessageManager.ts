@@ -34,7 +34,7 @@ export default class MessageManager implements MessageManagement {
   async pushMessageToQueue(message: SocketMessage): Promise<void> {
     console.info(
       `Pushing message to queue from ${
-        message.service?.friendlyName
+        message.service?.friendlyName ?? "SYS"
       } @ ${Date.now().toString()}`
     );
     return this.messageBridge.pushMessageToQueue(message);

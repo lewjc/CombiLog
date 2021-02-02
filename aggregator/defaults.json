@@ -1,0 +1,9 @@
+[
+  {
+    "friendlyName": "One"
+  },
+  {
+    "friendlyName": "Two",
+    "secret": "cool"
+  }
+]

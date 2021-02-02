@@ -1,14 +1,14 @@
 version: "2.0"
 services:
   dashboard:
-    image: lewjc/combilog-dashboard:1.0.0
+    image: lewjc/combilog-dashboard:latest-circleci-project-setup
     volumes:
       - combilog-dashboard:/usr/share/nginx/html/config/
     ports:
       - "9000:80"
     depends_on: [aggregator]
   archiver:
-    image: lewjc/combilog-archiver:1.0.0
+    image: lewjc/combilog-archiver:latest-feature-circle-ci-integration
     volumes:
       - combilog-archive:/usr/src/app/data
     ports:
@@ -17,7 +17,7 @@ services:
       - archive.env
     depends_on: [aggregator]
   aggregator:
-    image: lewjc/combilog-aggregator:1.0.0
+    image: lewjc/combilog-aggregator:latest-feature-initial-aggregator
     ports:
       - "13337:13337"
       - "3000:3000"

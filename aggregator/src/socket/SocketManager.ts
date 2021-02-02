@@ -121,17 +121,17 @@ class SocketManager implements SocketHub {
         connection.socket.ping(JSON.stringify(ping));
       });
 
-      console.log(`Pingged ${this.consumerConnections.length} Consumers`);
+      console.log(`PING: ${this.consumerConnections.length} Consumers`);
 
       this.serviceConnections.forEach((connection) => {
         connection.socket.ping(JSON.stringify(ping));
       });
 
-      console.log(`Pinged ${this.serviceConnections.length} Services`);
+      console.log(`PING ${this.serviceConnections.length} Services`);
 
       const keepaliveSignal: SocketMessage = {
         type: MessageType.KEEPALIVE,
-        content: "",
+        content: "KEEPALIVE",
       };
 
       this.messageManager.pushMessageToQueue(keepaliveSignal);
@@ -241,6 +241,7 @@ class SocketManager implements SocketHub {
       if (message != null) {
         switch (message.type) {
           case MessageType.LOG: {
+            message.content = `[${message.service.friendlyName}] ${message.content}`;
             await this.messageManager.pushMessageToQueue(message);
           }
 
