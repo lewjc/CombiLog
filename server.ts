@@ -1,4 +1,5 @@
 import express, { Application, Request, Response } from "express";
+import fs from "fs";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import AggregatorDatabase from "./src/db/AggregatorDatabase";
@@ -14,6 +15,10 @@ import { DB_TYPES } from "./src/db/inversify.types";
 import DatabaseContext from "./src/db/interfaces/DatabaseContext";
 import SocketHub from "./src/socket/interfaces/SocketHub";
 import { SOCKET_TYPES } from "./src/socket/inversify.types";
+import { Service } from "./src/service/types";
+import { MESSAGE_TYPES } from "./src/messages/inversify.types";
+import { SERVICE_TYPES } from "./src/service/inversify.types";
+import e from "express";
 
 const app: Application = express();
 dotenv.config();
@@ -33,6 +38,32 @@ app.use("/api", router);
 
 async function main() {
   const socketRegister = await setupSockerRegister();
+  const initialServiceFile =
+    process.env.COMBILOG_AGGREGATOR_INITIAL_SERVICE_FILE;
+  if (initialServiceFile) {
+    fs.readFile(initialServiceFile, "utf8", function (err, data) {
+      if (err) {
+        console.error(`Could not parse initial services files. Error: ${err}`);
+      } else {
+        const services: Service[] = JSON.parse(data);
+        const serviceManager = Resolver.get<ServiceManager>(
+          SERVICE_TYPES.ServiceManager
+        );
+        services.forEach((service) => {
+          const createdService = serviceManager.registerService(
+            service.friendlyName,
+            service.secret
+          );
+          if (createdService) {
+            console.log(`Created Service: ${service.friendlyName}`);
+          } else {
+            console.log("Error creating service.");
+          }
+        });
+      }
+    });
+  }
+
   app.listen(port, () => {
     console.log(`Listening on port ${port}`);
   });

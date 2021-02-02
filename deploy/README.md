@@ -14,3 +14,7 @@ For individual deployment info go to the relative repositories.
 _aggregator.env_
 
 This file contains the required environment variables for the CombiLog Aggregator
+
+_archive.env_
+
+This file contains the required environment variables for the CombiLog Archiver

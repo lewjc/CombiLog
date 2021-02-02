@@ -21,3 +21,12 @@ export type ServiceSocket = {
   service: Service;
   socket: WebSocket;
 };
+
+export type Ping = {
+  ping: string;
+};
+
+function isPing(type: any): type is Ping {
+  const potentialType = type as Ping;
+  return potentialType.ping === "pong";
+}
