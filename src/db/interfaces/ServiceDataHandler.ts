@@ -7,6 +7,8 @@ export default interface ServiceDataHandler {
 
   getServiceBySecret(secret: string): Promise<Service | null>;
 
+  getServiceByFriendlyName(friendlyName: string): Promise<Service | null>;
+
   getAllServices(): Promise<Service[] | null>;
 
   setServiceOnlineStatus(id: string, status: boolean): Promise<boolean>;
