@@ -1,9 +1,10 @@
 import { Connection } from "rethinkdb-ts";
+import { Settings } from "../../settings/types";
 import { DatabaseInfo } from "../types";
 
 export default interface DatabaseContext {
   readonly info: DatabaseInfo;
-  readonly tableKeys: object;
+  readonly defaultSettingsObject: Settings;
 
   initialiseDatabase(): Promise<void | void[]>;
 
@@ -18,4 +19,10 @@ export default interface DatabaseContext {
     databaseName: string,
     tableName: string
   ): Promise<void>;
+
+  initialiseSettingsTable(
+    connection: Connection,
+    resolve: (value: void | PromiseLike<void>) => void,
+    reject: (reason?: any) => void
+  ): Promise<any>;
 }

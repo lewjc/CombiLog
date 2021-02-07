@@ -6,5 +6,5 @@ export type DatabaseInfo = {
 export type TableNames = {
   message: string;
   service: string;
-  statistics: string;
+  settings: string;
 };
