@@ -241,7 +241,8 @@ class SocketManager implements SocketHub {
       if (message != null) {
         switch (message.type) {
           case MessageType.LOG: {
-            message.content = `[${message.service.friendlyName}] ${message.content}`;
+            if (message.content.includes(""))
+              message.content = `[${message.service.friendlyName}] ${message.content}`;
             await this.messageManager.pushMessageToQueue(message);
           }
 
