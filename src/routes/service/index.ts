@@ -14,6 +14,16 @@ router.post("/add", async (req: Request, res: Response) => {
       const register: ServiceManagement = Resolver.get<ServiceManagement>(
         SERVICE_TYPES.ServiceManager
       );
+      const isFriendlyNameRegistered = await register.isFriendlyNameRegistered(
+        friendlyName
+      );
+
+      if (isFriendlyNameRegistered) {
+        return res.status(400).json({
+          message: `Service with friendly name: ${friendlyName} already registered.`,
+        });
+      }
+
       const service = await register.registerService(
         req.body.friendlyName,
         secret
@@ -54,15 +64,22 @@ router.post("/bulk-add", async (req: Request, res: Response) => {
         const register: ServiceManagement = Resolver.get<ServiceManagement>(
           SERVICE_TYPES.ServiceManager
         );
-        const createdService = await register.registerService(
-          service.friendlyName,
-          service.secret
-        );
-        if (createdService) {
-          createdServices.push(createdService);
+
+        if (await register.isFriendlyNameRegistered("friendlyName")) {
+          errors.push(
+            `Service with friendly name: ${service.friendlyName} already registered.`
+          );
         } else {
-          errors.push("An error occured, please check the aggregator logs.");
-          isInternalServerError = true;
+          const createdService = await register.registerService(
+            service.friendlyName,
+            service.secret
+          );
+          if (createdService) {
+            createdServices.push(createdService);
+          } else {
+            errors.push("An error occured, please check the aggregator logs.");
+            isInternalServerError = true;
+          }
         }
       } else {
         errors.push(

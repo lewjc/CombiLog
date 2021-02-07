@@ -6,19 +6,20 @@ import {
 } from "rethinkdb-ts";
 import EnvironmentError from "../error/EnvironmentError";
 import { DatabaseInfo, TableNames } from "./types";
-import { SocketMessage } from "../messages/types";
+import { Settings } from "../settings/types";
 import DatabaseContext from "./interfaces/DatabaseContext";
 import { injectable } from "inversify";
+import e from "express";
+import { SETTINGS_OBJECT_ID } from "../settings/constants/constants";
 
 @injectable()
 export default class AggregatorDatabase implements DatabaseContext {
   readonly info: DatabaseInfo;
-  readonly tableKeys: object = {};
-
   private host?: string;
   private port?: number;
   private username?: string;
   private password?: string;
+  readonly defaultSettingsObject: Settings;
 
   /**
    * Interfaces with the database. Requires four environment variables to be set:
@@ -32,6 +33,10 @@ export default class AggregatorDatabase implements DatabaseContext {
     this.username = process.env.RETHINK_USER;
     this.password = process.env.RETHINK_PASSWORD ?? "";
     this.port = parseInt(process.env.RETHINK_PORT ?? "");
+    this.defaultSettingsObject = {
+      id: SETTINGS_OBJECT_ID,
+      colourRules: [],
+    };
 
     if (!this.host) {
       throw new EnvironmentError(
@@ -55,7 +60,7 @@ export default class AggregatorDatabase implements DatabaseContext {
       tableNames: {
         message: "MESSAGE",
         service: "SERVICE",
-        statistics: "STATISTICS",
+        settings: "SETTINGS",
       },
     };
   }
@@ -85,9 +90,23 @@ export default class AggregatorDatabase implements DatabaseContext {
         Object.values(this.info.tableNames).forEach(async (tableName) => {
           if (!tableNames.includes(tableName)) {
             const addTablePromise = new Promise<void>((resolve, reject) => {
-              this.createTable(connection, this.info.name, tableName).then(
-                resolve
-              );
+              if (tableName === this.info.tableNames.settings) {
+                // Create and intialise the settings table with 1 settings object that will be used to hold the CombiLog settings.
+                this.createTable(
+                  connection,
+                  this.info.name,
+                  tableName
+                ).then(() =>
+                  this.initialiseSettingsTable(connection, resolve, reject)
+                );
+              } else {
+                this.createTable(connection, this.info.name, tableName)
+                  .then(resolve)
+                  .catch((error) => {
+                    console.error(error);
+                    return reject;
+                  });
+              }
             });
             addTablePromises.push(addTablePromise);
           } else {
@@ -138,6 +157,31 @@ export default class AggregatorDatabase implements DatabaseContext {
         } else {
           console.info(`Successfuly created database ${name}.`);
         }
+      });
+  }
+
+  async initialiseSettingsTable(
+    connection: Connection,
+    resolve: (value: void | PromiseLike<void>) => void,
+    reject: (reason?: any) => void
+  ): Promise<any> {
+    return r
+      .table(this.info.tableNames.settings)
+      .insert(this.defaultSettingsObject)
+      .run(connection)
+      .then((result) => {
+        if (result.inserted > 0) {
+          resolve();
+        } else {
+          console.log(
+            `DEVELOPER ERROR: Settings object already exists on ${this.info.tableNames.settings} table creation`
+          );
+          reject();
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        reject();
       });
   }
 

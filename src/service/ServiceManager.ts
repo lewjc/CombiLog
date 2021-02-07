@@ -47,7 +47,7 @@ export default class ServiceManager implements ServiceManagement {
         eventCount: 0,
       };
       await this._serviceBridge.addNewService(service);
-      console.log(`Created new service: ${service}`);
+      console.log(`Created new service: ${JSON.stringify(service)}`);
       return service;
     } catch (e) {
       console.error(
@@ -57,6 +57,19 @@ export default class ServiceManager implements ServiceManagement {
     }
 
     return null;
+  }
+
+  async isFriendlyNameRegistered(friendlyName: string): Promise<boolean> {
+    const service = await this._serviceBridge.getServiceByFriendlyName(
+      friendlyName
+    );
+    console.log(service);
+    if (service !== null) {
+      console.error(`Service already exists for friendly name ${friendlyName}`);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   async findServiceBySecret(secret: string): Promise<Service | null> {

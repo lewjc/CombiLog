@@ -62,7 +62,9 @@ Handlers are packages you can install that make integrating with CombiLog easier
 ```
 $ git clone https://github.com/lewjc/CombiLog.git combilog-aggregator
 
-$ cd combilog-aggregator && npm start
+MAKE CHANGES
+
+$ npx tsc && node ./dist/server.js
 
 ```
 
