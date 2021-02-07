@@ -41,34 +41,24 @@ export default class ServiceBridge implements ServiceDataHandler {
   }
 
   async getServiceByID(serviceID: string): Promise<Service | null> {
-    return this.db.connect().then((connection: Connection) => {
-      return r
-        .table(this.db.info.tableNames.service)
-        .filter(r.row("id").eq(serviceID))
-        .run(connection)
-        .then((array: Array<any>) => {
-          if (array.length === 1) {
-            // Found the service, return a Service Object.
-            console.log(array);
-          }
-          // Was not found, return undefined
-          return null;
-        })
-        .catch((err) => {
-          console.error(err);
-          return null;
-        })
-        .finally(() => {
-          connection.close();
-        });
-    });
+    return this.findServiceBy("id", serviceID);
   }
 
   async getServiceBySecret(secret: string): Promise<Service | null> {
+    return this.findServiceBy("secret", secret);
+  }
+
+  async getServiceByFriendlyName(
+    friendlyName: string
+  ): Promise<Service | null> {
+    return this.findServiceBy("friendlyName", friendlyName);
+  }
+
+  private async findServiceBy(field: string, value: string) {
     return this.db.connect(this.db.info.name).then((connection: Connection) => {
       return r
         .table(this.db.info.tableNames.service)
-        .filter(r.row("secret").eq(secret))
+        .filter(r.row(field).eq(value))
         .run(connection)
         .then((array: Array<any>) => {
           if (array.length === 1) {
