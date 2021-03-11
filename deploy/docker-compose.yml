@@ -1,14 +1,14 @@
 version: "2.0"
 services:
   dashboard:
-    image: lewjc/combilog-dashboard:1.3.2
+    image: lewjc/combilog-dashboard:1.3.3
     volumes:
       - combilog-dashboard:/usr/share/nginx/html/config/
     ports:
       - "9000:80"
     depends_on: [aggregator]
   archiver:
-    image: lewjc/combilog-archiver:1.2.1
+    image: lewjc/combilog-archiver:1.2.2
     volumes:
       - combilog-archive:/usr/src/app/data
     ports:
