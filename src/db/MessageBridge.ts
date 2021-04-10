@@ -45,11 +45,6 @@ export default class MessageBridge implements MessageDataHandler {
             const socketMessage = newValue as SocketMessage;
 
             if (socketMessage.type !== MessageType.KEEPALIVE) {
-              console.log(
-                `Recieved message from ${
-                  socketMessage.service?.friendlyName
-                } @ ${Date.now().toString()}`
-              );
               onMessage(socketMessage);
             }
           }
