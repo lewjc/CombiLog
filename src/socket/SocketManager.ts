@@ -186,6 +186,10 @@ class SocketManager implements SocketHub {
         });
       } else {
         console.error(`No service found for secret: ${secret}`);
+        this.servicesConnecting.splice(
+          this.servicesConnecting.indexOf(secret),
+          1
+        );
         socket.close(ClosureCodes.UNREGISTERED_SERVICE);
       }
     });
