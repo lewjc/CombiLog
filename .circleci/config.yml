@@ -8,7 +8,7 @@ jobs:
       - IMAGE_NAME: lewjc/combilog-aggregator
       - MAJOR_VERSION: 1
       - MINOR_VERSION: 3
-      - PATCH_VERSION: 1
+      - PATCH_VERSION: 2
     docker:
       - image: circleci/buildpack-deps:stretch
     steps:
