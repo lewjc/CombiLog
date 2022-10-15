@@ -4,7 +4,7 @@ import { Service, ServiceManagement, SERVICE_TYPES } from "service";
 
 const router: Router = express.Router();
 // POST /service/add
-router.post("/add", async (req: Request, res: Response) => {
+router.post("/add", async (req: Request, res: Response, next) => {
   const friendlyName = req.body["friendlyName"];
   const secret = req.body["secret"];
   if (friendlyName) {
@@ -17,9 +17,10 @@ router.post("/add", async (req: Request, res: Response) => {
       );
 
       if (isFriendlyNameRegistered) {
-        return res.status(400).json({
+        res.status(400).json({
           message: `Service with friendly name: ${friendlyName} already registered.`,
         });
+        return next();
       }
 
       const service = await register.registerService(
@@ -48,6 +49,8 @@ router.post("/add", async (req: Request, res: Response) => {
       message: "No designated friendly name passed in request body.",
     });
   }
+
+  return next();
 });
 
 router.post("/bulk-add", async (req: Request, res: Response) => {
@@ -112,7 +115,7 @@ router.post("/bulk-add", async (req: Request, res: Response) => {
   }
 });
 
-router.get("/all", async (req: Request, res: Response) => {
+router.get("/all", async (_req: Request, res: Response) => {
   const manager: ServiceManagement = Resolver.get<ServiceManagement>(
     SERVICE_TYPES.ServiceManager
   );
@@ -129,11 +132,11 @@ router.get("/all", async (req: Request, res: Response) => {
   }
 });
 
-router.get("/heartbeat", async (req: Request, res: Response) => {
+router.get("/heartbeat", async (_req: Request, res: Response) => {
   res.send("beep");
 });
 
-export function isService(body: any): body is Service {
+export function isService(body: unknown): body is Service {
   const potentialType = body as Service;
   return (
     potentialType.friendlyName !== undefined &&

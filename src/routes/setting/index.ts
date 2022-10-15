@@ -4,7 +4,7 @@ import { SettingsManagement, SETTINGS_TYPES, isColourRule } from "settings";
 
 const router: Router = express.Router();
 
-router.get("/all", async (req: Request, res: Response) => {
+router.get("/all", async (_req: Request, res: Response) => {
   const settingsManager: SettingsManagement = Resolver.get<SettingsManagement>(
     SETTINGS_TYPES.SettingsManager
   );
@@ -49,7 +49,7 @@ router.post("/add-colour-rule", async (req: Request, res: Response) => {
   }
 });
 
-router.get("/colour-rules", async (req: Request, res: Response) => {
+router.get("/colour-rules", async (_req: Request, res: Response) => {
   const settingsManager: SettingsManagement = Resolver.get<SettingsManagement>(
     SETTINGS_TYPES.SettingsManager
   );

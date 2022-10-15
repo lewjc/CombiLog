@@ -11,7 +11,7 @@ router.use("/service", service);
 router.use("/message", message);
 router.use("/setting", setting);
 
-router.get("/version", async (req: Request, res: Response) => {
+router.get("/version", async (_req: Request, res: Response) => {
   res.status(200).json({
     version,
   });

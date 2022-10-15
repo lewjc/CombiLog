@@ -19,8 +19,8 @@ export class SettingsBridge implements SettingsDataHandler {
       return await r
         .table(this.db.info.tableNames.settings)
         .run(connection)
-        .then((settings: Array<any>) => settings?.pop())
-        .then((setting) => setting as Settings);
+        .then((settings: Array<Settings>) => settings?.pop() ?? null)
+        .then((setting) => setting);
     } catch (error) {
       console.error("An error occured getting the colour rules " + error);
       return null;
@@ -33,8 +33,8 @@ export class SettingsBridge implements SettingsDataHandler {
       return await r
         .table(this.db.info.tableNames.settings)
         .run(connection)
-        .then((settings: Array<any>) => settings?.pop())
-        .then((setting) => (setting as Settings).colourRules);
+        .then((settings: Array<Settings>) => settings?.pop() ?? null)
+        .then((setting) => setting?.colourRules ?? null);
     } catch (error) {
       console.error("An error occured getting the colour rules " + error);
       return null;

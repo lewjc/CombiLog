@@ -53,10 +53,11 @@ export class SocketManager implements SocketHub {
 
     this.initialiseAggregatorServerEvents();
     this.initialisePing();
-    this.changeFeed = this.messageManager
-      .initialiseConsumerMessageSubscription(this.consumerConnections)
-      .catch((error) => console.error(error));
+    this.changeFeed = this.messageManager.initialiseConsumerMessageSubscription(
+      this.consumerConnections
+    );
 
+    this.changeFeed.catch((error) => console.error(error));
     console.info("Socket Register Status: Ready!");
   }
 
@@ -251,6 +252,7 @@ export class SocketManager implements SocketHub {
               message.content = `[${message.service.friendlyName}] ${message.content}`;
             }
             await this.messageManager.pushMessageToQueue(message);
+            break;
           }
 
           default: {

@@ -23,6 +23,6 @@ export interface DatabaseContext {
   initialiseSettingsTable(
     connection: Connection,
     resolve: (value: void | PromiseLike<void>) => void,
-    reject: (reason?: any) => void
-  ): Promise<any>;
+    reject: () => void
+  ): Promise<void>;
 }
