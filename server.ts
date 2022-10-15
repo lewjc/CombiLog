@@ -1,14 +1,10 @@
-import express, { Application, Request, Response } from "express";
+import express, { Application } from "express";
 import fs from "fs";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import AggregatorDatabase from "./src/db/AggregatorDatabase";
 import router from "./src/routes/index";
-import SocketManager from "./src/socket/SocketManager";
 import ServiceManager from "./src/service/ServiceManager";
-import MessageManager from "./src/messages/MessageManager";
-import MessageBridge from "./src/db/MessageBridge";
-import ServiceBridge from "./src/db/ServiceBridge";
 import cors from "cors";
 import { Resolver } from "./src/inversify.config";
 import { DB_TYPES } from "./src/db/inversify.types";
@@ -16,9 +12,7 @@ import DatabaseContext from "./src/db/interfaces/DatabaseContext";
 import SocketHub from "./src/socket/interfaces/SocketHub";
 import { SOCKET_TYPES } from "./src/socket/inversify.types";
 import { Service } from "./src/service/types";
-import { MESSAGE_TYPES } from "./src/messages/inversify.types";
 import { SERVICE_TYPES } from "./src/service/inversify.types";
-import e from "express";
 
 const app: Application = express();
 dotenv.config();
@@ -37,7 +31,7 @@ const port: number = parseInt(process.env.COMBILOG_PORT ?? "8090");
 app.use("/api", router);
 
 async function main() {
-  const socketRegister = await setupSockerRegister();
+  await setupSockerRegister();
   const initialServiceFile =
     process.env.COMBILOG_AGGREGATOR_INITIAL_SERVICE_FILE;
   if (initialServiceFile) {
@@ -50,15 +44,16 @@ async function main() {
           SERVICE_TYPES.ServiceManager
         );
         services.forEach((service) => {
-          const createdService = serviceManager.registerService(
+          serviceManager.registerService(
             service.friendlyName,
             service.secret
-          );
-          if (createdService) {
-            console.log(`Created Service: ${service.friendlyName}`);
-          } else {
-            console.log("Error creating service.");
-          }
+          ).then((createdService) => {
+            if (createdService) {
+              console.log(`Created Service: ${service.friendlyName}`);
+            } else {
+              console.log("Error creating service.");
+            }
+          })
         });
       }
     });

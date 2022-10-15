@@ -1,5 +1,5 @@
 {
-  "name": "combilog-aggregator",
+  "name": "@combilog/aggregator",
   "version": "1.3.2",
   "description": "Aggregator service that handles all incoming logs, correctly tags them and sends them to any clients currently listening",
   "main": "server.js",
