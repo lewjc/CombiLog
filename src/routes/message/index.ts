@@ -1,13 +1,9 @@
 import express, { Router, Request, Response } from "express";
-import { SERVICE_TYPES } from "../../service/inversify.types";
-import { Service } from "../../service/types";
-import { Resolver } from "../../inversify.config";
-import ServiceManagement from "../../service/interfaces/ServiceManagement";
-import MessageManagement from "../../messages/interfaces/MessageManagement";
-import { MESSAGE_TYPES } from "../../messages/inversify.types";
+import { Resolver } from "inversify.config";
+import { MessageManagement, MESSAGE_TYPES } from "messages";
 
 const router: Router = express.Router();
-// POST /service/add
+
 router.delete("/:messageId", async (req: Request, res: Response) => {
   const messageId = req.params.messageId;
   if (messageId) {

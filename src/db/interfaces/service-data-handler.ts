@@ -1,6 +1,6 @@
-import { Service } from "../../service/types";
+import { Service } from "service";
 
-export default interface ServiceDataHandler {
+export interface ServiceDataHandler {
   addNewService(service: Service): Promise<void>;
 
   getServiceByID(serviceID: string): Promise<Service | null>;

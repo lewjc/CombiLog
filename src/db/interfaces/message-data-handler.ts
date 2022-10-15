@@ -1,6 +1,6 @@
-import { SocketMessage } from "../../messages/types";
+import { SocketMessage } from "messages";
 
-export default interface MessageDataHandler {
+export interface MessageDataHandler {
   subscribeToMessages(
     onMessage: (message: SocketMessage) => void
   ): Promise<void>;

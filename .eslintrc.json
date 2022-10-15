@@ -1,72 +1,26 @@
 {
-    "extends": [
-      "airbnb-typescript/base",
-      "plugin:jest/recommended",
-      "plugin:jest/style",
-      "plugin:unicorn/recommended",
-      "plugin:import/recommended",
-      "prettier"
-    ],
-    "overrides": [
-      {
-        "files": ["*.d.ts"],
-        "rules": {
-          "import/no-default-export": "off"
-        }
-      },
-      {
-        "files": ["*.test.ts"],
-        "rules": {
-          "max-classes-per-file": "off",
-          "unicorn/consistent-function-scoping": "off"
-        }
+  "extends": ["plugin:@typescript-eslint/recommended"],
+  "parser": "@typescript-eslint/parser",
+  "overrides": [
+    {
+      "files": ["*.d.ts"],
+      "rules": {
+        "import/no-default-export": "off"
       }
-    ],
-    "parserOptions": {
-      "project": "./tsconfig.json"
     },
-    "rules": {
-      "@typescript-eslint/explicit-member-accessibility": "error",
-      "class-methods-use-this": "off",
-      "curly": "error",
-      "import/extensions": [
-        "error",
-        "ignorePackages",
-        {
-          "js": "never",
-          "jsx": "never",
-          "ts": "never",
-          "tsx": "never"
-        }
-      ],
-      "import/no-cycle": "off",
-      "import/no-default-export": "error",
-      "import/order": [
-        "error",
-        {
-          "alphabetize": {
-            "order": "asc"
-          }
-        }
-      ],
-      "import/prefer-default-export": "off",
-      "jest/expect-expect": "off",
-      "no-continue": "off",
-      "no-restricted-syntax": "off",
-      "no-underscore-dangle": [
-        "error",
-        {
-          "allow": ["_id"]
-        }
-      ],
-      "prefer-arrow-callback": "error",
-      "sort-keys": "error",
-      "unicorn/no-null": "off",
-      "unicorn/no-unreadable-array-destructuring": "off",
-      "unicorn/no-useless-undefined": "off",
-      "unicorn/prevent-abbreviations": "off",
-      "unicorn/prefer-node-protocol": "off",
-      "unicorn/prefer-module": "off"
+    {
+      "files": ["*.test.ts"],
+      "rules": {
+        "max-classes-per-file": "off",
+        "unicorn/consistent-function-scoping": "off"
+      }
     }
+  ],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "rules": {
+    "@typescript-eslint/no-unused-vars": "error",
+    "no-unused-vars": "off"
   }
-  
+}

@@ -1,6 +1,6 @@
 import { ColourRule, Settings } from "../types";
 
-export default interface SettingsManagement {
+export interface SettingsManagement {
   getSettings(): Promise<Settings | null>;
   getColourRules(): Promise<ColourRule[] | null>;
   addColourRule(colourRule: ColourRule): Promise<boolean>;

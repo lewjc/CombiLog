@@ -1,47 +1,51 @@
 import "reflect-metadata";
-import { ConsumerSocket, ServiceSocket } from "./types";
-import WebSocket, { Server, Data } from "ws";
-import { IncomingMessage, STATUS_CODES } from "http";
-import { v4 as uuid } from "uuid";
-import { ClosureCodes } from "./enums/closureCodes";
+import { IncomingMessage } from "http";
+import { TLSSocket } from "tls";
 import url from "url";
-import { SocketMessage } from "../messages/types";
-import tls from "tls";
-import { MessageType } from "../messages/enums/MessageType";
-import { ErrorMessage } from "../messages/ErrorMessage";
-import { ErrorMessageCode } from "../messages/enums/ErrorMessageCodes";
-import SocketHub from "./interfaces/SocketHub";
 import { inject, injectable } from "inversify";
-import { SERVICE_TYPES } from "../service/inversify.types";
-import { MESSAGE_TYPES } from "../messages/inversify.types";
-import ServiceManagement from "../service/interfaces/ServiceManagement";
-import MessageManagement from "../messages/interfaces/MessageManagement";
-import { Service } from "../service/types";
+import { v4 as uuid } from "uuid";
+import WebSocket, { Server, Data } from "ws";
+import { ClosureCodes } from "./enums/closure-codes";
+import SocketHub from "./interfaces/socket-hub";
+import { ConsumerSocket, ServiceSocket } from "./types";
+import { Service, ServiceManagement, SERVICE_TYPES } from "../service";
+import {
+  ErrorMessage,
+  ErrorMessageCode,
+  MessageManagement,
+  MessageType,
+  MESSAGE_TYPES,
+  SocketMessage,
+} from "../messages";
 
 @injectable()
-class SocketManager implements SocketHub {
+export class SocketManager implements SocketHub {
   private serviceManager: ServiceManagement;
+
   private messageManager: MessageManagement;
 
   readonly server: Server;
+
   private readonly port: number;
+
   private readonly serviceConnections: Array<ServiceSocket> = [];
+
   private readonly consumerConnections: Array<ConsumerSocket> = [];
-  private readonly servicesConnecting: Array<String> = [];
+
+  private readonly servicesConnecting: Array<string> = [];
+
   private readonly changeFeed: Promise<void>;
 
-  constructor(
+  public constructor(
     @inject(SERVICE_TYPES.ServiceManager) serviceManager: ServiceManagement,
     @inject(MESSAGE_TYPES.MessageManager) messageManager: MessageManagement
   ) {
     this.serviceManager = serviceManager;
     this.messageManager = messageManager;
     console.info("Socket Manager Status: Setting Up...");
-    if (process.env.SOCKET_SERVER_PORT) {
-      this.port = parseInt(process.env.SOCKET_SERVER_PORT);
-    } else {
-      this.port = 13337;
-    }
+    this.port = process.env.SOCKET_SERVER_PORT
+      ? Number.parseInt(process.env.SOCKET_SERVER_PORT)
+      : 13337;
     this.server = new WebSocket.Server({
       port: this.port,
     });
@@ -49,12 +53,9 @@ class SocketManager implements SocketHub {
 
     this.initialiseAggregatorServerEvents();
     this.initialisePing();
-    this.changeFeed = this.messageManager.initialiseConsumerMessageSubscription(
-      this.consumerConnections
-    );
-    this.changeFeed.catch((err) => {
-      console.error(err);
-    });
+    this.changeFeed = this.messageManager
+      .initialiseConsumerMessageSubscription(this.consumerConnections)
+      .catch((error) => console.error(error));
 
     console.info("Socket Register Status: Ready!");
   }
@@ -63,31 +64,32 @@ class SocketManager implements SocketHub {
     this.server.on(
       "connection",
       (socket: WebSocket, request: IncomingMessage) => {
-        let builtUrl: string =
-          request.socket instanceof tls.TLSSocket
+        const builtUrl: string =
+          request.socket instanceof TLSSocket
             ? "https"
             : "http" + "://" + (request.headers.host ?? "") + request.url;
 
         if (builtUrl) {
-          let incomingUrl = url.parse(builtUrl, true);
+          const incomingUrl = url.parse(builtUrl, true);
           const connectionType: string | Array<string> | undefined =
-            incomingUrl.query["connectionType"];
-          if (!connectionType || connectionType instanceof Array) {
+            incomingUrl.query.connectionType;
+          if (!connectionType || Array.isArray(connectionType)) {
             console.error(
               `Invalid connection type query parameter passed ${connectionType}`
             );
             socket.close(ClosureCodes.INVALID_CONNECTION_QUERY_PARAM);
           } else if (connectionType === "service") {
-            let secret = request.headers["combilog-service-secret"] ?? "";
+            const secret = request.headers["combilog-service-secret"] ?? "";
 
-            if (!secret || secret instanceof Array) {
+            if (!secret || Array.isArray(secret)) {
               console.error(
                 `Invalid secret header provided for service connection.`
               );
               socket.close(ClosureCodes.INVALID_SECRET);
             } else if (
-              this.serviceConnections.filter((x) => x.service.secret === secret)
-                .length > 0 ||
+              this.serviceConnections.some(
+                (x) => x.service.secret === secret
+              ) ||
               this.servicesConnecting.includes(secret)
             ) {
               console.error(`Secret already in use.`);
@@ -117,32 +119,32 @@ class SocketManager implements SocketHub {
     };
 
     setInterval(() => {
-      this.consumerConnections.forEach((connection) => {
+      for (const connection of this.consumerConnections) {
         connection.socket.ping(JSON.stringify(ping));
-      });
+      }
 
       console.log(`PING: ${this.consumerConnections.length} Consumers`);
 
-      this.serviceConnections.forEach((connection) => {
+      for (const connection of this.serviceConnections) {
         connection.socket.ping(JSON.stringify(ping));
-      });
+      }
 
       console.log(`PING ${this.serviceConnections.length} Services`);
 
       const keepaliveSignal: SocketMessage = {
-        type: MessageType.KEEPALIVE,
         content: "KEEPALIVE",
+        type: MessageType.KEEPALIVE,
       };
 
       this.messageManager.pushMessageToQueue(keepaliveSignal);
-    }, 55000);
+    }, 55_000);
   }
 
   private handleServiceConnection(socket: WebSocket, secret: string): void {
     this.serviceManager.findServiceBySecret(secret).then((service) => {
       if (service) {
         const sessionID = uuid();
-        let serviceSocket: ServiceSocket = {
+        const serviceSocket: ServiceSocket = {
           id: sessionID,
           service: service,
           socket: socket,
@@ -162,7 +164,7 @@ class SocketManager implements SocketHub {
 
         const closeConnection = () => {
           const index = this.serviceConnections
-            .map(function (e) {
+            .map((e) => {
               return e.service.secret;
             })
             .indexOf(secret);
@@ -197,7 +199,7 @@ class SocketManager implements SocketHub {
 
   private handleConsumerConnection(socket: WebSocket): void {
     const sessionID = uuid();
-    let consumerSocket: ConsumerSocket = {
+    const consumerSocket: ConsumerSocket = {
       id: sessionID,
       socket: socket,
     };
@@ -205,7 +207,7 @@ class SocketManager implements SocketHub {
 
     const closeConnection = () => {
       const index = this.consumerConnections
-        .map(function (e) {
+        .map((e) => {
           return e.id;
         })
         .indexOf(sessionID);
@@ -245,8 +247,9 @@ class SocketManager implements SocketHub {
       if (message != null) {
         switch (message.type) {
           case MessageType.LOG: {
-            if (message.content.includes(""))
+            if (message.content.includes("")) {
               message.content = `[${message.service.friendlyName}] ${message.content}`;
+            }
             await this.messageManager.pushMessageToQueue(message);
           }
 
@@ -262,8 +265,8 @@ class SocketManager implements SocketHub {
           }
         }
       }
-    } catch (e) {
-      if (e instanceof SyntaxError) {
+    } catch (error) {
+      if (error instanceof SyntaxError) {
         console.error(
           "Data recieved from service socket was not in a parseable format."
         );
@@ -271,5 +274,3 @@ class SocketManager implements SocketHub {
     }
   }
 }
-
-export default SocketManager;

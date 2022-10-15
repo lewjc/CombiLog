@@ -1,9 +1,6 @@
 import express, { Router, Request, Response } from "express";
-import { SERVICE_TYPES } from "../../service/inversify.types";
-import { Resolver } from "../../inversify.config";
-import { isColourRule } from "../../settings/types";
-import SettingsManagement from "../../settings/interfaces/SettingsManagement";
-import { SETTINGS_TYPES } from "../../settings/inversify.types";
+import { Resolver } from "inversify.config";
+import { SettingsManagement, SETTINGS_TYPES, isColourRule } from "settings";
 
 const router: Router = express.Router();
 
@@ -29,9 +26,8 @@ router.post("/add-colour-rule", async (req: Request, res: Response) => {
   const rule = req.body["colourRule"];
 
   if (isColourRule(rule)) {
-    const settingsManager: SettingsManagement = Resolver.get<SettingsManagement>(
-      SETTINGS_TYPES.SettingsManager
-    );
+    const settingsManager: SettingsManagement =
+      Resolver.get<SettingsManagement>(SETTINGS_TYPES.SettingsManager);
 
     const success = await settingsManager.addColourRule(rule);
 
@@ -75,9 +71,8 @@ router.delete("/colour-rules/:name", async (req: Request, res: Response) => {
   const ruleName: string = req.params.name;
 
   if (ruleName) {
-    const settingsManager: SettingsManagement = Resolver.get<SettingsManagement>(
-      SETTINGS_TYPES.SettingsManager
-    );
+    const settingsManager: SettingsManagement =
+      Resolver.get<SettingsManagement>(SETTINGS_TYPES.SettingsManager);
     const success = await settingsManager.deleteColourRuleByName(ruleName);
 
     if (success) {
@@ -99,9 +94,8 @@ router.delete("/colour-rules/:name", async (req: Request, res: Response) => {
 router.patch("/edit-colour-rule", async (req: Request, res: Response) => {
   const rule = req.body["colourRule"];
   if (isColourRule(rule)) {
-    const settingsManager: SettingsManagement = Resolver.get<SettingsManagement>(
-      SETTINGS_TYPES.SettingsManager
-    );
+    const settingsManager: SettingsManagement =
+      Resolver.get<SettingsManagement>(SETTINGS_TYPES.SettingsManager);
 
     const success = await settingsManager.updateColourRule(rule);
 

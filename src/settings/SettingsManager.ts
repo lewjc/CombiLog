@@ -1,10 +1,9 @@
 import "reflect-metadata";
-import SettingsManagement from "./interfaces/SettingsManagement";
 import { inject, injectable } from "inversify";
 import { DB_TYPES } from "../db/inversify.types";
-import SettingsDataHandler from "../db/interfaces/SettingsDataHandler";
 import { ColourRule, Settings } from "./types";
-import e from "express";
+import { SettingsDataHandler } from "../db";
+import { SettingsManagement } from "./interfaces";
 
 @injectable()
 export default class SettingsManager implements SettingsManagement {

@@ -1,0 +1,13 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.rulers": [80],
+  "stylelint.enable": false,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "jest.autoRun": "off",
+  "jest.showCoverageOnLoad": false,
+  "eslint.workingDirectories": [{ "pattern": "./src" }]
+}

@@ -1,7 +1,7 @@
-import { ConsumerSocket } from "../../socket/types";
+import { ConsumerSocket } from "socket";
 import { SocketMessage } from "../types";
 
-export default interface MessageManagement {
+export interface MessageManagement {
   initialiseConsumerMessageSubscription(
     consumerConnections: Array<ConsumerSocket>
   ): Promise<void>;

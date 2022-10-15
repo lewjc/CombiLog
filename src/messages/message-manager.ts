@@ -1,37 +1,37 @@
 import "reflect-metadata";
-import { ConsumerSocket } from "../socket/types";
-import { SocketMessage } from "./types";
-import MessageManagement from "./interfaces/MessageManagement";
 import { inject, injectable } from "inversify";
-import { DB_TYPES } from "../db/inversify.types";
-import MessageDataHandler from "../db/interfaces/MessageDataHandler";
+import { ConsumerSocket } from "socket";
+import { MessageManagement } from "./interfaces/message-management";
+import { SocketMessage } from "./types";
+import { DB_TYPES, MessageDataHandler } from "db";
 
 @injectable()
-export default class MessageManager implements MessageManagement {
+export class MessageManager implements MessageManagement {
   private readonly messageBridge: MessageDataHandler;
 
-  constructor(
+  public constructor(
     @inject(DB_TYPES.MessageBridge) messageBridge: MessageDataHandler
   ) {
     this.messageBridge = messageBridge;
   }
-  async deleteMessage(id: string): Promise<boolean> {
+
+  public async deleteMessage(id: string): Promise<boolean> {
     return this.messageBridge.removeMessage(id);
   }
 
-  async initialiseConsumerMessageSubscription(
+  public async initialiseConsumerMessageSubscription(
     consumerConnections: Array<ConsumerSocket>
   ): Promise<void> {
     return this.messageBridge.subscribeToMessages((message) => {
-      consumerConnections.forEach((consumerSocket) => {
+      for (const consumerSocket of consumerConnections) {
         if (message) {
           consumerSocket.socket.send(JSON.stringify(message));
         }
-      });
+      }
     });
   }
 
-  async pushMessageToQueue(message: SocketMessage): Promise<void> {
+  public async pushMessageToQueue(message: SocketMessage): Promise<void> {
     return this.messageBridge.pushMessageToQueue(message);
   }
 }

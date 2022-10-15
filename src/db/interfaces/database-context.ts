@@ -1,8 +1,8 @@
 import { Connection } from "rethinkdb-ts";
-import { Settings } from "../../settings/types";
+import { Settings } from "settings/types";
 import { DatabaseInfo } from "../types";
 
-export default interface DatabaseContext {
+export interface DatabaseContext {
   readonly info: DatabaseInfo;
   readonly defaultSettingsObject: Settings;
 

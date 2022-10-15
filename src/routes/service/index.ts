@@ -1,8 +1,6 @@
 import express, { Router, Request, Response } from "express";
-import { SERVICE_TYPES } from "../../service/inversify.types";
-import { Service } from "../../service/types";
-import { Resolver } from "../../inversify.config";
-import ServiceManagement from "../../service/interfaces/ServiceManagement";
+import { Resolver } from "inversify.config";
+import { Service, ServiceManagement, SERVICE_TYPES } from "service";
 
 const router: Router = express.Router();
 // POST /service/add
@@ -135,7 +133,7 @@ router.get("/heartbeat", async (req: Request, res: Response) => {
   res.send("beep");
 });
 
-function isService(body: any): body is Service {
+export function isService(body: any): body is Service {
   const potentialType = body as Service;
   return (
     potentialType.friendlyName !== undefined &&

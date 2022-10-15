@@ -1,6 +1,6 @@
 import { Service } from "../types";
 
-export default interface ServiceManagement {
+export interface ServiceManagement {
   registerService(
     friendlyName: string,
     secret?: string

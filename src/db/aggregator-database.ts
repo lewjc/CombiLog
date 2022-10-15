@@ -1,24 +1,27 @@
+import { injectable } from "inversify";
 import {
   r,
   RConnectionOptions,
   Connection,
   DBChangeResult,
 } from "rethinkdb-ts";
-import EnvironmentError from "../error/EnvironmentError";
-import { DatabaseInfo, TableNames } from "./types";
-import { Settings } from "../settings/types";
-import DatabaseContext from "./interfaces/DatabaseContext";
-import { injectable } from "inversify";
-import e from "express";
-import { SETTINGS_OBJECT_ID } from "../settings/constants/constants";
+import { EnvironmentError } from "error";
+import { SETTINGS_OBJECT_ID, Settings } from "settings";
+import { DatabaseContext } from "./interfaces";
+import { DatabaseInfo } from "./types";
 
 @injectable()
-export default class AggregatorDatabase implements DatabaseContext {
+export class AggregatorDatabase implements DatabaseContext {
   readonly info: DatabaseInfo;
+
   private host?: string;
+
   private port?: number;
+
   private username?: string;
+
   private password?: string;
+
   readonly defaultSettingsObject: Settings;
 
   /**
@@ -28,14 +31,14 @@ export default class AggregatorDatabase implements DatabaseContext {
    *  - RETHINK_PASSWORD
    *  - RETHINK_PORT
    */
-  constructor() {
+  public constructor() {
     this.host = process.env.RETHINK_HOST;
     this.username = process.env.RETHINK_USER;
     this.password = process.env.RETHINK_PASSWORD ?? "";
-    this.port = parseInt(process.env.RETHINK_PORT ?? "");
+    this.port = Number.parseInt(process.env.RETHINK_PORT ?? "");
     this.defaultSettingsObject = {
-      id: SETTINGS_OBJECT_ID,
       colourRules: [],
+      id: SETTINGS_OBJECT_ID,
     };
 
     if (!this.host) {
@@ -49,7 +52,7 @@ export default class AggregatorDatabase implements DatabaseContext {
       );
     }
 
-    if (isNaN(this.port)) {
+    if (Number.isNaN(this.port)) {
       throw new EnvironmentError(
         EnvironmentError.MISSING_ENVIRONMENT_VARIABLE("RETHINK_PORT")
       );
@@ -92,12 +95,9 @@ export default class AggregatorDatabase implements DatabaseContext {
             const addTablePromise = new Promise<void>((resolve, reject) => {
               if (tableName === this.info.tableNames.settings) {
                 // Create and intialise the settings table with 1 settings object that will be used to hold the CombiLog settings.
-                this.createTable(
-                  connection,
-                  this.info.name,
-                  tableName
-                ).then(() =>
-                  this.initialiseSettingsTable(connection, resolve, reject)
+                this.createTable(connection, this.info.name, tableName).then(
+                  () =>
+                    this.initialiseSettingsTable(connection, resolve, reject)
                 );
               } else {
                 this.createTable(connection, this.info.name, tableName)
@@ -126,28 +126,31 @@ export default class AggregatorDatabase implements DatabaseContext {
       });
   }
 
-  async connect(db: string = "test"): Promise<Connection> {
+  public async connect(db = "test"): Promise<Connection> {
     const connectionOptions: RConnectionOptions = {
+      db: db,
       host: this.host,
+      password: this.password,
       port: this.port,
       user: this.username,
-      db: db,
-      password: this.password,
     };
 
     return r.connect(connectionOptions);
   }
 
-  async close(connection: Connection): Promise<void> {
+  public async close(connection: Connection): Promise<void> {
     try {
       return await connection.close();
-    } catch (e) {
+    } catch (error) {
       // TODO: Logging
-      return new Promise<void>(() => console.error(e));
+      return new Promise<void>(() => console.error(error));
     }
   }
 
-  async createDatabase(connection: Connection, name: string): Promise<void> {
+  public async createDatabase(
+    connection: Connection,
+    name: string
+  ): Promise<void> {
     return r
       .dbCreate(name)
       .run(connection)
@@ -160,11 +163,11 @@ export default class AggregatorDatabase implements DatabaseContext {
       });
   }
 
-  async initialiseSettingsTable(
+  public async initialiseSettingsTable(
     connection: Connection,
     resolve: (value: void | PromiseLike<void>) => void,
-    reject: (reason?: any) => void
-  ): Promise<any> {
+    reject: () => void
+  ): Promise<void> {
     return r
       .table(this.info.tableNames.settings)
       .insert(this.defaultSettingsObject)
@@ -185,7 +188,7 @@ export default class AggregatorDatabase implements DatabaseContext {
       });
   }
 
-  async createTable(
+  public async createTable(
     connection: Connection,
     databaseName: string,
     tableName: string

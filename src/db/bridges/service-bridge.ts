@@ -1,13 +1,11 @@
-import AggregatorDatabase from "./AggregatorDatabase";
-import { r, Connection, isCursor } from "rethinkdb-ts";
-import { Service } from "../service/types";
-import ServiceDataHandler from "./interfaces/ServiceDataHandler";
 import { inject, injectable } from "inversify";
-import { DB_TYPES } from "./inversify.types";
-import DatabaseContext from "./interfaces/DatabaseContext";
+import { r, Connection } from "rethinkdb-ts";
+import { DatabaseContext, ServiceDataHandler } from "../interfaces";
+import { DB_TYPES } from "../inversify.types";
+import { Service } from "service";
 
 @injectable()
-export default class ServiceBridge implements ServiceDataHandler {
+export class ServiceBridge implements ServiceDataHandler {
   private readonly db: DatabaseContext;
 
   constructor(@inject(DB_TYPES.AggreagtorDatabase) db: DatabaseContext) {
@@ -55,66 +53,62 @@ export default class ServiceBridge implements ServiceDataHandler {
   }
 
   private async findServiceBy(field: string, value: string) {
-    return this.db.connect(this.db.info.name).then((connection: Connection) => {
-      return r
+    return this.db.connect(this.db.info.name).then((connection: Connection) =>
+      r
         .table(this.db.info.tableNames.service)
         .filter(r.row(field).eq(value))
         .run(connection)
-        .then((array: Array<any>) => {
+        .then((array: Array<Service>) => {
           if (array.length === 1) {
             return array[0] as Service;
           }
           return null;
         })
-        .catch((err) => {
-          console.error(err);
+        .catch((error) => {
+          console.error(error);
           return null;
         })
         .finally(() => {
           connection.close();
-        });
-    });
+        })
+    );
   }
 
   async getAllServices(): Promise<Service[] | null> {
-    return this.db.connect(this.db.info.name).then((connection: Connection) => {
-      return r
+    return this.db.connect(this.db.info.name).then((connection: Connection) =>
+      r
         .table(this.db.info.tableNames.service)
         .run(connection)
         .then((values) => {
           return values as Service[];
         })
-        .catch((err) => {
-          console.error(err);
+        .catch((error) => {
+          console.error(error);
           return null;
         })
         .finally(() => {
           connection.close();
-        });
-    });
+        })
+    );
   }
 
   async setServiceOnlineStatus(id: string, status: boolean): Promise<boolean> {
-    return this.db.connect(this.db.info.name).then((connection: Connection) => {
-      return r
+    return this.db.connect(this.db.info.name).then((connection: Connection) =>
+      r
         .table(this.db.info.tableNames.service)
         .get(id)
         .update({ online: status })
         .run(connection)
         .then((x) => {
-          if (x.changes && x.changes.length > 0) {
-            return true;
-          } else {
-            return false;
-          }
+          return x.changes && x.changes.length > 0 ? true : false;
         })
-        .catch((err) => {
-          console.error(err);
+        .catch((error) => {
+          console.error(error);
           return false;
         })
         .finally(() => {
           connection.close();
-        });
-    });
+        })
+    );
   }
 }

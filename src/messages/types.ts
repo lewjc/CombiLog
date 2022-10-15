@@ -1,6 +1,6 @@
-import { MessageType } from "./enums/MessageType";
-import { ErrorMessageCode } from "./enums/ErrorMessageCodes";
-import { Service } from "../service/types";
+import { Service } from "service";
+import { ErrorMessageCode } from "./enums/error-message-codes";
+import { MessageType } from "./enums/message-type";
 
 export type SocketMessage = {
   id?: string;

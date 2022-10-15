@@ -1,5 +1,5 @@
-import { Service } from "../service/types";
 import WebSocket from "ws";
+import { Service } from "../service/types";
 
 /**
  * @type ServiceSocket
@@ -26,7 +26,7 @@ export type Ping = {
   ping: string;
 };
 
-function isPing(type: any): type is Ping {
+export function isPing(type: any): type is Ping {
   const potentialType = type as Ping;
   return potentialType.ping === "pong";
 }

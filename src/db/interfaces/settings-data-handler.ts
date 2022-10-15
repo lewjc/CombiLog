@@ -1,7 +1,6 @@
-import { Service } from "../../service/types";
-import { ColourRule, Settings } from "../../settings/types";
+import { ColourRule, Settings } from "settings";
 
-export default interface SettingsDataHandler {
+export interface SettingsDataHandler {
   getSettings(): Promise<Settings | null>;
   getColourRules(): Promise<Array<ColourRule> | null>;
   addColourRule(rule: ColourRule): Promise<boolean>;

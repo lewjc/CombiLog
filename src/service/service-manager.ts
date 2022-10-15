@@ -1,14 +1,13 @@
 import "reflect-metadata";
 import { v4 as uuid } from "uuid";
 import { Service } from "./types";
-import ServiceManagement from "./interfaces/ServiceManagement";
+import { ServiceManagement } from "./interfaces/service-management";
 import cryptoRandomString from "crypto-random-string";
 import { inject, injectable } from "inversify";
-import { DB_TYPES } from "../db/inversify.types";
-import ServiceDataHandler from "../db/interfaces/ServiceDataHandler";
+import { ServiceDataHandler, DB_TYPES } from "../db";
 
 @injectable()
-export default class ServiceManager implements ServiceManagement {
+export class ServiceManager implements ServiceManagement {
   private _serviceBridge: ServiceDataHandler;
 
   constructor(

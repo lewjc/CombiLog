@@ -1,17 +1,15 @@
-import { ConsumerSocket } from "../socket/types";
-import { SocketMessage } from "../messages/types";
-import { r } from "rethinkdb-ts";
-import MessageDataHandler from "./interfaces/MessageDataHandler";
 import { inject, injectable } from "inversify";
-import { DB_TYPES } from "./inversify.types";
-import DatabaseContext from "./interfaces/DatabaseContext";
-import { MessageType } from "../messages/enums/MessageType";
+import { r } from "rethinkdb-ts";
+import { MessageType } from "messages/enums/message-type";
+import { SocketMessage } from "messages/types";
+import { MessageDataHandler, DatabaseContext } from "../interfaces";
+import { DB_TYPES } from "../inversify.types";
 
 @injectable()
-export default class MessageBridge implements MessageDataHandler {
+export class MessageBridge implements MessageDataHandler {
   private readonly db: DatabaseContext;
 
-  constructor(@inject(DB_TYPES.AggreagtorDatabase) db: DatabaseContext) {
+  public constructor(@inject(DB_TYPES.AggreagtorDatabase) db: DatabaseContext) {
     this.db = db;
   }
 
@@ -40,7 +38,7 @@ export default class MessageBridge implements MessageDataHandler {
             );
             return;
           }
-          const newValue = row["new_val"];
+          const newValue = row.new_val;
           if (newValue) {
             const socketMessage = newValue as SocketMessage;
 
@@ -50,12 +48,12 @@ export default class MessageBridge implements MessageDataHandler {
           }
         });
       })
-      .catch((x) => {
-        console.error("Error occured when listening to changes: " + x);
+      .catch((error) => {
+        console.error("Error occured when listening to changes: " + error);
       });
   }
 
-  async pushMessageToQueue(message: SocketMessage) {
+  public async pushMessageToQueue(message: SocketMessage) {
     return this.db.connect(this.db.info.name).then((connection) => {
       return r
         .table(this.db.info.tableNames.message)
@@ -77,7 +75,7 @@ export default class MessageBridge implements MessageDataHandler {
     });
   }
 
-  async removeMessage(id: string): Promise<boolean> {
+  public async removeMessage(id: string): Promise<boolean> {
     return this.db.connect(this.db.info.name).then((connection) => {
       return r
         .table(this.db.info.tableNames.message)
@@ -85,8 +83,8 @@ export default class MessageBridge implements MessageDataHandler {
         .delete()
         .run(connection)
         .then((result) => result.deleted === 1)
-        .catch((err) => {
-          console.error(err);
+        .catch((error) => {
+          console.error(error);
           return false;
         })
         .finally(() => {

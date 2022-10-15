@@ -4,16 +4,26 @@
     "lib": ["es6"],
     "module": "commonjs",
     "outDir": "./dist",
-    /* Strict Type-Checking Options */
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    /* Skip type checking of declaration files. */
     "forceConsistentCasingInFileNames": true,
     "types": ["reflect-metadata"],
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": "src",
+    "allowJs": true,
+    "declaration": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": true,
+    "sourceMap": true
   }
 }
