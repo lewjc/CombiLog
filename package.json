@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc && cp ./.env ./dist",
+    "lint": "lint -- --init",
     "build": "tsc -p ."
   },
   "author": "Lewis Cummins",
@@ -32,5 +33,14 @@
     "typescript": "^3.9.7",
     "uuid": "^8.3.0",
     "ws": "^7.3.1"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "eslint": "^8.0.1",
+    "eslint-config-standard-with-typescript": "^23.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "typescript": "*"
   }
 }
