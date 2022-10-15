@@ -16,8 +16,7 @@ import { MessageManagement, MessageManager, MESSAGE_TYPES } from "./messages";
 import { ServiceManager, ServiceManagement, SERVICE_TYPES } from "./service";
 import { SettingsManagement, SETTINGS_TYPES } from "./settings";
 import SettingsManager from "./settings/SettingsManager";
-import SocketHub from "./socket/interfaces/socket-hub";
-import { SocketManager, SOCKET_TYPES } from "./socket";
+import { SocketHub, SocketManager, SOCKET_TYPES } from "./socket";
 
 const Resolver = new Container();
 

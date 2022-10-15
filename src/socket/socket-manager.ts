@@ -6,7 +6,6 @@ import { inject, injectable } from "inversify";
 import { v4 as uuid } from "uuid";
 import WebSocket, { Server, Data } from "ws";
 import { ClosureCodes } from "./enums/closure-codes";
-import SocketHub from "./interfaces/socket-hub";
 import { ConsumerSocket, ServiceSocket } from "./types";
 import { Service, ServiceManagement, SERVICE_TYPES } from "../service";
 import {
@@ -17,6 +16,7 @@ import {
   MESSAGE_TYPES,
   SocketMessage,
 } from "../messages";
+import { SocketHub } from "./interfaces";
 
 @injectable()
 export class SocketManager implements SocketHub {

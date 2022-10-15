@@ -1,5 +1,5 @@
 import { Server } from "ws";
 
-export default interface SocketHub {
+export interface SocketHub {
   server: Server;
 }
