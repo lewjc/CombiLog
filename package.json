@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc && cp ./.env ./dist",
-    "lint": "lint -- --init",
+    "lint": "eslint .",
     "build": "tsc -p ."
   },
   "author": "Lewis Cummins",
@@ -36,11 +36,12 @@
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.0.0",
-    "eslint": "^8.0.1",
-    "eslint-config-standard-with-typescript": "^23.0.0",
-    "eslint-plugin-import": "^2.25.2",
-    "eslint-plugin-n": "^15.0.0",
-    "eslint-plugin-promise": "^6.0.0",
+    "eslint": "^8.23.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jest": "^27.0.2",
+    "eslint-plugin-unicorn": "^43.0.2",
     "typescript": "*"
   }
 }
